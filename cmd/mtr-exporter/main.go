@@ -9,14 +9,26 @@ import (
 	"net/http"
 	"os"
 	"strings"
-
+	"io/ioutil"
+	"fmt"
+    "gopkg.in/yaml.v2"
 	"github.com/robfig/cron/v3"
 )
+type Config struct {
+	Hosts     []Host   `yaml:"hosts"`
+}
 
+type Host struct {
+	Name  string `yaml:"name"`
+	Alias string `yaml:"alias"`
+}
+
+var config Config
 func main() {
 
 	log.SetFlags(0)
 
+	configFile   := flag.String("config.file", "mtr.yaml", "MTR exporter configuration file.")
 	rawTargets := flag.String("targets", "", "List of targets")
 	mtrBin := flag.String("mtr", "mtr", "path to `mtr` binary")
 	bind := flag.String("bind", ":8080", "bind address")
@@ -29,7 +41,17 @@ func main() {
 	flag.Parse()
 
 	targets := strings.Split(*rawTargets, " ")
+    
+    yamlFile, err := ioutil.ReadFile(*configFile)
 
+    if err != nil {
+		log.Fatalf("Error reading config file: %s", err)
+	}
+
+	err = yaml.Unmarshal(yamlFile, &config)
+	if err != nil {
+		log.Fatalf("Error parsing config file: %s", err)
+	}
 
 	if *doPrintVersion == true {
 		printVersion()
@@ -48,7 +70,7 @@ func main() {
 		os.Exit(1)
 		return
 	}
-
+     fmt.Printf("--- config:\n%v\n\n", config)
 	jobs := make([]*mtrJob, len(targets))
 	for i, target := range targets {
 		args := append([]string{target}, flag.Args()...)
