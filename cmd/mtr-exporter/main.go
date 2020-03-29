@@ -15,13 +15,12 @@ import (
 	"github.com/robfig/cron/v3"
 )
 type Config struct {
-	Hosts     []Host   `yaml:"hosts"`
+	Hosts     []string  `yaml:"hosts"`
 }
 
-type Host struct {
-	Name  string `yaml:"name"`
-	Alias string `yaml:"alias"`
-}
+//type Host struct {
+//	Alias string `yaml:"name"`
+//}
 
 var config Config
 func main() {
@@ -42,16 +41,7 @@ func main() {
 
 	targets := strings.Split(*rawTargets, " ")
     
-    yamlFile, err := ioutil.ReadFile(*configFile)
-
-    if err != nil {
-		log.Fatalf("Error reading config file: %s", err)
-	}
-
-	err = yaml.Unmarshal(yamlFile, &config)
-	if err != nil {
-		log.Fatalf("Error parsing config file: %s", err)
-	}
+   
 
 	if *doPrintVersion == true {
 		printVersion()
@@ -70,9 +60,31 @@ func main() {
 		os.Exit(1)
 		return
 	}
-     fmt.Printf("--- config:\n%v\n\n", config)
-	jobs := make([]*mtrJob, len(targets))
-	for i, target := range targets {
+
+    yamlFile, err := ioutil.ReadFile(*configFile)
+
+    if err != nil {
+		log.Fatalf("Error reading config file: %s", err)
+	}
+
+	err = yaml.Unmarshal(yamlFile, &config)
+	if err != nil {
+		log.Fatalf("Error parsing config file: %s", err)
+	}
+     
+     j := len(config.Hosts)
+     fmt.Printf("--- lenght:\n%v\n\n", )
+     fmt.Printf("--- config:\n%v\n\n", config.Hosts)
+
+     for k,v := range config.Hosts {
+     	fmt.Printf("host: %v\n", k)
+        fmt.Printf("address:%v\n", v) 
+     }
+
+
+
+	jobs := make([]*mtrJob, j)
+	for i, target := range  config.Hosts {
 		args := append([]string{target}, flag.Args()...)
 		job := newMtrJob(*mtrBin, args)
 
