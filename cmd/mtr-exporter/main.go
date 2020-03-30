@@ -10,7 +10,6 @@ import (
 	"os"
 	"strings"
 	"io/ioutil"
-	"fmt"
     "gopkg.in/yaml.v2"
 	"github.com/robfig/cron/v3"
 )
@@ -18,9 +17,6 @@ type Config struct {
 	Hosts     []string  `yaml:"hosts"`
 }
 
-//type Host struct {
-//	Alias string `yaml:"name"`
-//}
 
 var config Config
 func main() {
@@ -73,13 +69,7 @@ func main() {
 	}
      
      j := len(config.Hosts)
-     fmt.Printf("--- lenght:\n%v\n\n", )
-     fmt.Printf("--- config:\n%v\n\n", config.Hosts)
-
-     for k,v := range config.Hosts {
-     	fmt.Printf("host: %v\n", k)
-        fmt.Printf("address:%v\n", v) 
-     }
+     
 
 
 
